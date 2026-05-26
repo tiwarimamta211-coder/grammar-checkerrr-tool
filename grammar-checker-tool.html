@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrammarPro - Advanced Grammar Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --accent: #8b5cf6;
+            --gradient: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            padding: 24px 20px;
+            border-bottom: 2px solid var(--gray-200);
+            background: linear-gradient(135deg, #2563eb 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .logo-section h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .logo-section p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .user-profile {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--light);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-header:hover {
+            opacity: 0.8;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .profile-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .profile-info p {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .nav-section {
+            padding: 16px 20px;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--dark);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: var(--light);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #2563eb15 0%, #8b5cf615 100%);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--light);
+            overflow-y: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Text Input Area */
+        .editor-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            flex: 1;
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            outline: none;
+        }
+
+        textarea::placeholder {
+            color: var(--gray-400);
+        }
+
+        .suggestions-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 600px;
+        }
+
+        .suggestions-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, #2563eb08 0%, #8b5cf608 100%);
+        }
+
+        .suggestions-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-badge {
+            background: var(--danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .suggestions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .suggestion-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .suggestion-item:hover {
+            background: var(--light);
+            padding-left: 24px;
+        }
+
+        .suggestion-error {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .error-type {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .error-type.grammar {
+            background: #ef444420;
+            color: var(--danger);
+        }
+
+        .error-type.spelling {
+            background: #f59e0b20;
+            color: var(--warning);
+        }
+
+        .error-type.punctuation {
+            background: #06b6d420;
+            color: #0891b2;
+        }
+
+        .suggestion-text {
+            font-size: 13px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .suggestion-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn-accept {
+            background: var(--success);
+            color: white;
+        }
+
+        .suggestion-btn-accept:hover {
+            background: #059669;
+        }
+
+        .suggestion-btn-ignore {
+            background: var(--gray-300);
+            color: var(--dark);
+        }
+
+        .suggestion-btn-ignore:hover {
+            background: var(--gray-400);
+        }
+
+        .empty-state {
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--gray-400);
+        }
+
+        .empty-state i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-section h4 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .share-btn {
+            padding: 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--dark);
+        }
+
+        .share-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--light);
+        }
+
+        .share-btn i {
+            font-size: 16px;
+        }
+
+        .like-section {
+            text-align: center;
+            padding: 12px 0;
+            border-radius: 8px;
+            background: var(--light);
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+
+        .like-btn.liked {
+            color: var(--danger);
+            transform: scale(1.2);
+        }
+
+        .like-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-card-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-card-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .export-btn {
+            padding: 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark);
+        }
+
+        .export-btn:hover {
+            border-color: var(--success);
+            color: var(--success);
+            background: var(--light);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--dark);
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--dark);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .suggestions-section {
+                max-height: 300px;
+            }
+
+            .sidebar {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--gray-200);
+                overflow: visible;
+            }
+
+            .main-content {
+                flex: 1;
+                overflow-y: auto;
+            }
+
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 16px;
+            }
+
+            .suggestions-section {
+                max-height: 400px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .logo-section {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .share-buttons {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .content-wrapper {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .share-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <h1><i class="fas fa-spell-check"></i> GrammarPro</h1>
+                <p>Professional writing assistant</p>
+            </div>
+
+            <div class="user-profile">
+                <div class="profile-header" onclick="openProfileModal()">
+                    <div class="profile-avatar" id="profileAvatar">JD</div>
+                    <div class="profile-info">
+                        <h3 id="userName">John Doe</h3>
+                        <p id="userEmail">john@example.com</p>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalChecks">0</div>
+                        <div class="stat-label">Checks</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalFixed">0</div>
+                        <div class="stat-label">Fixed</div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-title">Main</div>
+                <div class="nav-item active" onclick="switchTab('checker')">
+                    <i class="fas fa-spell-check"></i> Grammar Checker
+                </div>
+                <div class="nav-item" onclick="switchTab('history')">
+                    <i class="fas fa-history"></i> History
+                </div>
+                <div class="nav-item" onclick="switchTab('settings')">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-title">Tools</div>
+                <div class="nav-item" onclick="openModal('plagiarism')">
+                    <i class="fas fa-search"></i> Plagiarism Check
+                </div>
+                <div class="nav-item" onclick="openModal('readability')">
+                    <i class="fas fa-chart-line"></i> Readability
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h2>Grammar Checker</h2>
+                <div class="header-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="clearText()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="checkGrammar()">
+                        <i class="fas fa-check-circle"></i> Check Now
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <!-- Editor -->
+                <div class="editor-section">
+                    <div class="editor-header">
+                        <h3>Your Text</h3>
+                        <span class="char-count"><span id="charCount">0</span> characters</span>
+                    </div>
+                    <div class="textarea-wrapper">
+                        <textarea id="textInput" placeholder="Paste or type your text here to check grammar, spelling, and punctuation..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="right-sidebar">
+                    <!-- Suggestions -->
+                    <div class="suggestions-section">
+                        <div class="suggestions-header">
+                            <h3>
+                                <i class="fas fa-lightbulb"></i> Suggestions
+                                <span class="error-badge" id="errorCount">0</span>
+                            </h3>
+                        </div>
+                        <div class="suggestions-list" id="suggestionsList">
+                            <div class="empty-state">
+                                <i class="fas fa-file-check"></i>
+                                <p>No issues found yet. Start typing!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Share & Like -->
+                    <div class="sidebar-section">
+                        <h4>Share & Like</h4>
+                        <div class="like-section">
+                            <button class="like-btn" id="likeBtn" onclick="toggleLike()">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <span class="like-count" id="likeCount">0 Likes</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h4>Share with Others</h4>
+                        <div class="share-buttons">
+                            <button class="share-btn" onclick="shareOn('twitter')">
+                                <i class="fab fa-twitter"></i> Twitter
+                            </button>
+                            <button class="share-btn" onclick="shareOn('facebook')">
+                                <i class="fab fa-facebook"></i> Facebook
+                            </button>
+                            <button class="share-btn" onclick="shareOn('linkedin')">
+                                <i class="fab fa-linkedin"></i> LinkedIn
+                            </button>
+                            <button class="share-btn" onclick="shareOn('email')">
+                                <i class="fas fa-envelope"></i> Email
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="sidebar-section">
+                        <h4>Statistics</h4>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-card-value" id="wordCount">0</div>
+                                <div class="stat-card-label">Words</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-value" id="sentenceCount">0</div>
+                                <div class="stat-card-label">Sentences</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-value" id="readingTime">0</div>
+                                <div class="stat-card-label">Min Read</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export -->
+                    <div class="sidebar-section">
+                        <h4>Export Report</h4>
+                        <div class="export-options">
+                            <button class="export-btn" onclick="exportReport('pdf')">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                            <button class="export-btn" onclick="exportReport('docx')">
+                                <i class="fas fa-file-word"></i> DOCX
+                            </button>
+                            <button class="export-btn" onclick="exportReport('txt')">
+                                <i class="fas fa-file-alt"></i> TXT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Profile</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="inputName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="inputEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label>Preferred Language</label>
+                    <select id="languageSelect">
+                        <option>English - US</option>
+                        <option>English - UK</option>
+                        <option>English - Australia</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('profileModal')">Cancel</button>
+                <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">Share Your Report</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Share Link</label>
+                    <input type="text" id="shareLink" value="https://grammarpro.io/report/abc123" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="shareMessage" placeholder="Add a message..." style="height: 100px; resize: vertical;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('shareModal')">Close</button>
+                <button class="btn btn-primary btn-sm" onclick="copyShareLink()">
+                    <i class="fas fa-copy"></i> Copy Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">Settings</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="autoCheck" checked> Automatic Grammar Check
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="spellCheck" checked> Spell Check
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="punctuationCheck" checked> Punctuation Check
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Check Sensitivity</label>
+                    <select id="sensitivity">
+                        <option>Basic</option>
+                        <option selected>Standard</option>
+                        <option>Advanced</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('settingsModal')">Close</button>
+                <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize app
+        const app = {
+            text: '',
+            suggestions: [],
+            likeCount: 0,
+            userStats: {
+                checks: 0,
+                fixed: 0
+            },
+            user: {
+                name: 'John Doe',
+                email: 'john@example.com',
+                avatar: 'JD'
+            }
+        };
+
+        // Grammar checking database
+        const grammarRules = [
+            {
+                pattern: /\byour\s+going\b/gi,
+                suggestion: "Did you mean 'you\'re' (you are)?",
+                type: 'grammar'
+            },
+            {
+                pattern: /\bthere\s+going\b/gi,
+                suggestion: "Did you mean 'they\'re' (they are)?",
+                type: 'grammar'
+            },
+            {
+                pattern: /\bis\s+are\b/gi,
+                suggestion: "Use 'are' for plural subjects or 'is' for singular",
+                type: 'grammar'
+            },
+            {
+                pattern: /\ba+\s+[aeiou]/gi,
+                suggestion: "Use 'an' before vowel sounds",
+                type: 'grammar'
+            },
+            {
+                pattern: /\bthe\s+the\b/gi,
+                suggestion: "Remove duplicate 'the'",
+                type: 'spelling'
+            },
+            {
+                pattern: /\b([\w]+)\s+\1\b/gi,
+                suggestion: "Avoid repeating the same word",
+                type: 'grammar'
+            },
+            {
+                pattern: /\s{2,}/g,
+                suggestion: "Remove extra spaces",
+                type: 'punctuation'
+            },
+            {
+                pattern: /[.,!?]\s*[.,!?]/g,
+                suggestion: "Avoid multiple punctuation marks",
+                type: 'punctuation'
+            }
+        ];
+
+        // Local storage
+        function loadFromStorage() {
+            const stored = localStorage.getItem('grammarProData');
+            if (stored) {
+                Object.assign(app, JSON.parse(stored));
+                updateUI();
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('grammarProData', JSON.stringify(app));
+        }
+
+        // Text input handling
+        document.getElementById('textInput').addEventListener('input', (e) => {
+            app.text = e.target.value;
+            updateCharCount();
+            updateStatistics();
+            if (document.getElementById('autoCheck').checked) {
+                checkGrammar();
+            }
+            saveToStorage();
+        });
+
+        // Check grammar
+        function checkGrammar() {
+            const text = app.text;
+            app.suggestions = [];
+
+            grammarRules.forEach((rule, idx) => {
+                const matches = text.matchAll(rule.pattern);
+                for (const match of matches) {
+                    app.suggestions.push({
+                        id: idx + '_' + match.index,
+                        text: match[0],
+                        position: match.index,
+                        suggestion: rule.suggestion,
+                        type: rule.type,
+                        replacementText: generateReplacement(rule, match[0])
+                    });
+                }
+            });
+
+            app.userStats.checks++;
+            displaySuggestions();
+            saveToStorage();
+        }
+
+        function generateReplacement(rule, text) {
+            if (rule.pattern.source.includes('your')) return text.replace('your', 'you\'re');
+            if (rule.pattern.source.includes('there')) return text.replace('there', 'they\'re');
+            if (rule.pattern.source.includes('a+')) return 'an' + text.slice(1);
+            if (rule.pattern.source.includes('the\\s+the')) return 'the';
+            return text;
+        }
+
+        function displaySuggestions() {
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+            if (app.suggestions.length === 0) {
+                suggestionsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-check"></i>
+                        <p>No issues found! Well done!</p>
+                    </div>
+                `;
+                document.getElementById('errorCount').textContent = '0';
+                return;
+            }
+
+            document.getElementById('errorCount').textContent = app.suggestions.length;
+
+            suggestionsList.innerHTML = app.suggestions.map(sugg => `
+                <div class="suggestion-item">
+                    <div class="suggestion-error">
+                        <span class="error-type ${sugg.type}">${sugg.type}</span>
+                        <span class="suggestion-text" style="flex: 1;">"${sugg.text.substring(0, 40)}..."</span>
+                    </div>
+                    <div class="suggestion-text">${sugg.suggestion}</div>
+                    <div class="suggestion-actions">
+                        <button class="suggestion-btn suggestion-btn-accept" onclick="acceptSuggestion('${sugg.id}')">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="suggestion-btn suggestion-btn-ignore" onclick="ignoreSuggestion('${sugg.id}')">
+                            <i class="fas fa-times"></i> Ignore
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function acceptSuggestion(id) {
+            const suggestion = app.suggestions.find(s => s.id === id);
+            if (suggestion) {
+                app.text = app.text.replace(suggestion.text, suggestion.replacementText);
+                document.getElementById('textInput').value = app.text;
+                app.userStats.fixed++;
+                app.suggestions = app.suggestions.filter(s => s.id !== id);
+                displaySuggestions();
+                showToast('✓ Suggestion accepted!');
+                saveToStorage();
+            }
+        }
+
+        function ignoreSuggestion(id) {
+            app.suggestions = app.suggestions.filter(s => s.id !== id);
+            displaySuggestions();
+            showToast('Suggestion ignored');
+        }
+
+        // Character & word count
+        function updateCharCount() {
+            const chars = app.text.length;
+            document.getElementById('charCount').textContent = chars;
+        }
+
+        function updateStatistics() {
+            const text = app.text;
+            const words = text.trim().split(/\s+/).filter(w => w).length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim()).length;
+            const readingTime = Math.ceil(words / 200);
+
+            document.getElementById('wordCount').textContent = words;
+            document.getElementById('sentenceCount').textContent = sentences;
+            document.getElementById('readingTime').textContent = readingTime;
+        }
+
+        // Like functionality
+        function toggleLike() {
+            const likeBtn = document.getElementById('likeBtn');
+            const likeCount = document.getElementById('likeCount');
+            
+            likeBtn.classList.toggle('liked');
+            
+            if (likeBtn.classList.contains('liked')) {
+                app.likeCount++;
+                likeBtn.innerHTML = '<i class="fas fa-heart"></i>';
+            } else {
+                app.likeCount = Math.max(0, app.likeCount - 1);
+                likeBtn.innerHTML = '<i class="far fa-heart"></i>';
+            }
+            
+            likeCount.textContent = app.likeCount + ' ' + (app.likeCount === 1 ? 'Like' : 'Likes');
+            saveToStorage();
+        }
+
+        // Share functionality
+        function shareOn(platform) {
+            const text = encodeURIComponent(app.text.substring(0, 100) + '...');
+            const url = 'https://grammarpro.io';
+
+            const urls = {
+                twitter: `https://twitter.com/intent/tweet?text=Check my grammar with GrammarPro: ${text}&url=${url}`,
+                facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`,
+                linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+                email: `mailto:?subject=Check my writing with GrammarPro&body=${text}`
+            };
+
+            if (urls[platform]) {
+                window.open(urls[platform], '_blank', 'width=600,height=400');
+            }
+
+            showToast(`✓ Opened ${platform}!`);
+        }
+
+        // Export functionality
+        function exportReport(format) {
+            const timestamp = new Date().toLocaleString();
+            let content = `GRAMMAR REPORT\n`;
+            content += `Generated: ${timestamp}\n`;
+            content += `User: ${app.user.name}\n`;
+            content += `=`.repeat(50) + `\n\n`;
+            content += `TEXT:\n${app.text}\n\n`;
+            content += `STATISTICS:\n`;
+            content += `- Characters: ${app.text.length}\n`;
+            content += `- Words: ${document.getElementById('wordCount').textContent}\n`;
+            content += `- Sentences: ${document.getElementById('sentenceCount').textContent}\n`;
+            content += `- Issues Found: ${app.suggestions.length}\n\n`;
+            content += `ISSUES:\n`;
+            app.suggestions.forEach((s, i) => {
+                content += `${i + 1}. [${s.type.toUpperCase()}] "${s.text}" - ${s.suggestion}\n`;
+            });
+
+            let filename = `grammar-report.${format}`;
+            let type = 'text/plain';
+
+            if (format === 'pdf') {
+                // Simple PDF generation
+                const pdf = new (window.PDFDocument || class {})();
+                filename = 'grammar-report.pdf';
+            } else if (format === 'docx') {
+                filename = 'grammar-report.docx';
+                type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+            }
+
+            const blob = new Blob([content], { type });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+
+            showToast(`✓ Report exported as ${format.toUpperCase()}!`);
+        }
+
+        // Clear text
+        function clearText() {
+            if (confirm('Are you sure you want to clear all text?')) {
+                app.text = '';
+                document.getElementById('textInput').value = '';
+                app.suggestions = [];
+                displaySuggestions();
+                updateCharCount();
+                updateStatistics();
+                showToast('Text cleared');
+                saveToStorage();
+            }
+        }
+
+        // Profile management
+        function openProfileModal() {
+            document.getElementById('inputName').value = app.user.name;
+            document.getElementById('inputEmail').value = app.user.email;
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function saveProfile() {
+            app.user.name = document.getElementById('inputName').value;
+            app.user.email = document.getElementById('inputEmail').value;
+            app.user.avatar = app.user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            
+            updateUI();
+            closeModal('profileModal');
+            showToast('✓ Profile updated!');
+            saveToStorage();
+        }
+
+        // Modal management
+        function openModal(type) {
+            if (type === 'plagiarism') {
+                showToast('Plagiarism check feature coming soon!');
+            } else if (type === 'readability') {
+                showToast('Readability analysis coming soon!');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Settings
+        function saveSettings() {
+            closeModal('settingsModal');
+            showToast('✓ Settings saved!');
+        }
+
+        // Share copy to clipboard
+        function copyShareLink() {
+            const shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            showToast('✓ Link copied to clipboard!');
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            if (tab === 'history') {
+                showToast('History feature coming soon!');
+            } else if (tab === 'settings') {
+                document.getElementById('settingsModal').classList.add('active');
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('userName').textContent = app.user.name;
+            document.getElementById('userEmail').textContent = app.user.email;
+            document.getElementById('profileAvatar').textContent = app.user.avatar;
+            document.getElementById('totalChecks').textContent = app.userStats.checks;
+            document.getElementById('totalFixed').textContent = app.userStats.fixed;
+            document.getElementById('likeCount').textContent = app.likeCount + ' ' + (app.likeCount === 1 ? 'Like' : 'Likes');
+        }
+
+        // Modal close on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Initialize
+        loadFromStorage();
+        updateUI();
+    </script>
+</body>
+</html>
